@@ -11,6 +11,7 @@ using CBD.IdentityService.Port.Services;
 using CBD.IdentityService.Port.Services.Authentication;
 using CBD.IdentityService.Port.Services.Authorization;
 using CBD.IdentityService.Port.Services.Information;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -31,11 +32,8 @@ public static class Program {
 			var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 			await context.Database.EnsureCreatedAsync();
 		}
-
 		using (var scope = app.Services.CreateScope())
-		{
 			await InsertUsersForTestsAsync(scope.ServiceProvider);
-		}
 		await app.RunAsync();
 	}
 
@@ -69,6 +67,16 @@ public static class Program {
 			}
 			);
 	}
+	
+	private static void ConfigureOptions(WebApplicationBuilder builder, out JwtIssuingOptions jwtIssuingOptions) {
+		builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
+		
+		jwtIssuingOptions = new JwtIssuingOptions();
+		builder.Configuration.Bind(JwtIssuingOptions.AppSettingsKey, jwtIssuingOptions);
+		builder.Services.Configure<JwtIssuingOptions>(builder.Configuration.GetSection(JwtIssuingOptions.AppSettingsKey));
+		
+		builder.Services.Configure<EmailHostOptions>(builder.Configuration.GetSection(EmailHostOptions.AppSettingsKey));
+	}
 
 	private static void ConfigureControllers(WebApplicationBuilder builder) {
 		builder.Services.AddControllers();
@@ -96,6 +104,7 @@ public static class Program {
 					optionsBuilder => {
 						optionsBuilder.MigrationsAssembly(typeof(Program).Assembly.GetName().Name);
 					})
+				//.AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>())
 		);
 	}
 
@@ -130,16 +139,9 @@ public static class Program {
 			}
 		);
 	}
-	
-	private static void ConfigureOptions(WebApplicationBuilder builder, out JwtIssuingOptions jwtIssuingOptions) {
-		builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
-		jwtIssuingOptions = new JwtIssuingOptions();
-		builder.Configuration.Bind(JwtIssuingOptions.AppSettingsKey, jwtIssuingOptions);
-		builder.Services.Configure<JwtIssuingOptions>(builder.Configuration.GetSection(JwtIssuingOptions.AppSettingsKey));
-		builder.Services.Configure<EmailHostOptions>(builder.Configuration.GetSection(EmailHostOptions.AppSettingsKey));
-	}
 
 	private static void ConfigurePipeline(WebApplication app) {
+		// Configure the HTTP request pipeline.
 		if (app.Environment.IsDevelopment()) {
 			app.UseSwagger();
 			app.UseSwaggerUI();
@@ -154,7 +156,6 @@ public static class Program {
 
 		app.MapControllers();
 	}
-	
 
 	private static async Task InsertUsersForTestsAsync(IServiceProvider dependencyInjectionServiceProvider)
 	{
