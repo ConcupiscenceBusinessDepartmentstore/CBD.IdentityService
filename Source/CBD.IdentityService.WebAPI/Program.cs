@@ -34,6 +34,10 @@ public static class Program {
 			await context.Database.EnsureCreatedAsync();
 		}
 
+		using (var scope = app.Services.CreateScope())
+		{
+			await InsertUsersForTestsAsync(scope.ServiceProvider);
+		}
 		await app.RunAsync();
 	}
 
@@ -154,5 +158,39 @@ public static class Program {
 		app.UseAuthorization();
 
 		app.MapControllers();
+	}
+	
+
+	private static async Task InsertUsersForTestsAsync(IServiceProvider dependencyInjectionServiceProvider)
+	{
+		var userManager = dependencyInjectionServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+		var roleManager = dependencyInjectionServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+		IdentityUser adminUser = new()
+		{
+			UserName = "admin",
+			Email = "admin@mail.com",
+		};
+		IdentityUser traderUser = new()
+		{
+			UserName = "trader",
+			Email = "trader@mail.com",
+		};
+		IdentityUser consumerUser = new()
+		{
+			UserName = "consumer",
+			Email = "consumer@mail.com",
+		};
+
+		var c = await userManager.CreateAsync(adminUser, "Admin-pw2023");
+		await userManager.CreateAsync(traderUser, "Trader-pw2023");
+		await userManager.CreateAsync(consumerUser, "Consumer-pw2023");
+
+		await roleManager.CreateAsync(new IdentityRole(nameof(Roles.Administrator)));
+		await roleManager.CreateAsync(new IdentityRole(nameof(Roles.Trader)));
+		await roleManager.CreateAsync(new IdentityRole(nameof(Roles.Consumer)));
+		
+		await userManager.AddToRoleAsync(adminUser, nameof(Roles.Administrator));
+		await userManager.AddToRoleAsync(traderUser, nameof(Roles.Trader));
+		await userManager.AddToRoleAsync(consumerUser, nameof(Roles.Consumer));
 	}
 }
