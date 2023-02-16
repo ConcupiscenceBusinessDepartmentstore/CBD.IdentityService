@@ -20,12 +20,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\CBD.IdentityService.Core\CBD.IdentityService.Core.csproj" />
       <ProjectReference Include="..\CBD.IdentityService.Port\CBD.IdentityService.Port.csproj" />
     </ItemGroup>

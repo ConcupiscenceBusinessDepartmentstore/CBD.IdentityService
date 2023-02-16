@@ -1,0 +1,23 @@
+﻿version: '3.8'
+services:
+  identity_api:
+    build: .
+    command: 'dotnet CBD.IdentityService.WebAPI.dll --urls="http://*:7001;https://*:8001" --environment="Development"'
+    restart: unless-stopped
+    ports:
+      - 7001:7001
+    networks:
+      - cbd_net
+    depends_on:
+      - identity_cache
+      
+  identity_cache:
+    image: redis:6.2.6-alpine
+    restart: unless-stopped
+    command: redis-server --loglevel warning
+    networks:
+      - cbd_net
+    
+networks:
+  cbd_net:
+    name: cbd_net

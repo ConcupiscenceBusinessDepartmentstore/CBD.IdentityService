@@ -1,8 +1,6 @@
 ﻿using System.Reflection;
 using System.Text;
 using CBD.IdentityService.Core.Enums;
-using EasyCaching.Core.Configurations;
-using EFCoreSecondLevelCacheInterceptor;
 using CBD.IdentityService.Core.Options;
 using CBD.IdentityService.Core.Services;
 using CBD.IdentityService.Core.Services.Authentication;
@@ -98,7 +96,6 @@ public static class Program {
 					optionsBuilder => {
 						optionsBuilder.MigrationsAssembly(typeof(Program).Assembly.GetName().Name);
 					})
-				//.AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>())
 		);
 	}
 
@@ -136,11 +133,9 @@ public static class Program {
 	
 	private static void ConfigureOptions(WebApplicationBuilder builder, out JwtIssuingOptions jwtIssuingOptions) {
 		builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
-		
 		jwtIssuingOptions = new JwtIssuingOptions();
 		builder.Configuration.Bind(JwtIssuingOptions.AppSettingsKey, jwtIssuingOptions);
 		builder.Services.Configure<JwtIssuingOptions>(builder.Configuration.GetSection(JwtIssuingOptions.AppSettingsKey));
-		
 		builder.Services.Configure<EmailHostOptions>(builder.Configuration.GetSection(EmailHostOptions.AppSettingsKey));
 	}
 
