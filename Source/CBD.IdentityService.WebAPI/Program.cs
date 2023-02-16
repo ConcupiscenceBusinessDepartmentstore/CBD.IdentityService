@@ -59,7 +59,7 @@ public static class Program {
 					Contact = new OpenApiContact {
 						Name = "Dustin Eikmeier",
 						Email = "s0569494@htw-berlin.de",
-						Url = new Uri("https://github.com/orgs/ConcupiscenceBusinessDepartmentstore/")
+						Url = new Uri("https://github.com/orgs/ConcupiscenceBusinessDepartmentstore/CBD.IdentityService")
 					}
 				});
 				swaggerOptions.CustomSchemaIds(type => type.FullName);
