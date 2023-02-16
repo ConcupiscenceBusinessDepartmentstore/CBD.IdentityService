@@ -1,0 +1,8 @@
+bin/
+obj/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+/Source/CBD.IdentityService.WebApi/appsettings.json
+/Source/CBD.IdentityService.WebApi/appsettings.Development.json
+.idea/
